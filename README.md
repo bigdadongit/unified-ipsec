@@ -1,432 +1,525 @@
-# Unified Cross-Platform IPsec Solution
+# Unified Cross-Platform IPsec Solution# Unified Cross-Platform IPsec Solution
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![GitHub code size](https://img.shields.io/badge/status-production-ready-brightgreen.svg)
-![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)
 
-A comprehensive cross-platform IPsec management solution enabling administrators to define security policies **once** in YAML and automatically deploy them across Linux, Windows, macOS, and Boss OS systems.
 
-## 🎯 Problem Statement
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Managing IPsec configurations across heterogeneous operating systems is painful:
+![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)
 
-- **Linux** uses strongSwan with `ipsec.conf`
-- **Windows** uses PowerShell cmdlets and Group Policy
-- **macOS** uses racoon or IKEv2 profiles
 
-Network administrators must maintain separate configurations for each platform, leading to:
-- Configuration drift
-- Human error
-- Increased operational complexity
-- Security policy inconsistencies
 
-## 💡 Our Solution
+A unified IPsec solution for enterprises to automatically encrypt network traffic across Windows, Linux (Ubuntu/Debian/RHEL/BOSS), and macOS using centrally defined policies.A unified IPsec solution for enterprises to automatically encrypt network traffic across Windows, Linux (Ubuntu/Debian/RHEL/BOSS), and macOS using centrally defined policies.
 
-**Unified IPsec** provides:
-1. **Single policy file** (`policy.yaml`) that works across all platforms
-2. **Automatic translation** to platform-specific configurations
+
+
+## Problem Statement## Problem Statement
+
+
+
+Enterprise networks consist of diverse operating systems (Windows, Linux, macOS, BOSS) requiring consistent encryption policies. Currently:Enterprise networks consist of diverse operating systems (Windows, Linux, macOS, BOSS) requiring consistent encryption policies. Currently:
+
+- **Linux** uses strongSwan with `ipsec.conf`- **Linux** uses strongSwan with `ipsec.conf`
+
+- **Windows** uses PowerShell cmdlets and IPsec rules- **Windows** uses PowerShell cmdlets and IPsec rules
+
+- **macOS** uses racoon or IKEv2 profiles- **macOS** uses racoon or IKEv2 profiles
+
+- **BOSS OS** requires custom kernel module integration- **BOSS OS** requires custom kernel module integration
+
+
+
+This fragmentation leads to configuration inconsistencies, security gaps, deployment delays, and operational complexity.This fragmentation leads to:
+
+- Configuration inconsistencies and security gaps
+
+## Solution- Deployment delays and operational complexity
+
+- Manual configuration on each device
+
+**Unified IPsec** provides:- Lack of centralized policy management
+
+1. **Single policy file** (`policy.yaml`) deployed across all operating systems
+
+2. **Automatic encryption** of traffic based on centrally defined policies## Solution
+
 3. **Zero-touch deployment** with auto-start on boot
-4. **Simple architecture** designed for rapid prototyping
 
-## 🏗️ Architecture
+4. **Complete IPsec mode support** (ESP Tunnel, ESP Transport, AH Tunnel, AH Transport, ESP+AH)**Unified IPsec** provides:
+
+5. **Multi-tunnel capability** for different peers and subnets1. **Single policy file** (`policy.yaml`) deployed to all operating systems
+
+6. **Comprehensive logging** for tunnel status and troubleshooting2. **Automatic encryption** of traffic based on centrally defined policies
+
+3. **Zero-touch deployment** with auto-start on boot
+
+## Architecture4. **Complete IPsec mode support** (ESP Tunnel, ESP Transport, AH Tunnel, AH Transport, ESP+AH)
+
+5. **Multi-tunnel capability** for different peers and subnets
 
 ```
-┌─────────────────────────────────────────────────┐
-│           policy.yaml (Unified Policy)          │
-│  - Global settings (IKE, PSK, crypto)          │
-│  - Tunnel definitions (tunnel/transport)       │
-└────────────────┬────────────────────────────────┘
-                 │
-                 ▼
-┌─────────────────────────────────────────────────┐
-│        policy_engine.py (Orchestrator)          │
-│  - Loads & validates policy                    │
-│  - Detects operating system                    │
-│  - Calls appropriate adapter                   │
-│  - Logs all operations                         │
-└────────────────┬────────────────────────────────┘
-                 │
-       ┌─────────┴─────────┬──────────────┐
-       ▼                   ▼              ▼
-┌─────────────┐  ┌──────────────┐  ┌─────────────┐
-│   Linux     │  │   Windows    │  │    macOS    │
-│  Adapter    │  │   Adapter    │  │   Adapter   │
-│             │  │              │  │   (stub)    │
-│ strongSwan  │  │ PowerShell   │  │             │
-│ ipsec.conf  │  │ IPsec Rules  │  │   setkey    │
-└─────────────┘  └──────────────┘  └─────────────┘
-```
+
+Policy Definition (policy.yaml)## Architecture
+
+          ↓
+
+Policy Engine (policy_engine.py)```
+
+          ↓┌──────────────────────────────┐
+
+    Platform Detection│   policy.yaml (Unified)      │
+
+          ↓│  - IPsec modes & protocols   │
+
+    ┌─────┬─────┬──────┐│  - Encryption algorithms     │
+
+    ▼     ▼     ▼      ▼│  - Authentication methods    │
+
+  Linux Windows macOS BOSS OS└────────────┬─────────────────┘
+
+```             │
+
+             ▼
+
+**Components:**┌──────────────────────────────┐
+
+- **controller/policy.yaml** - Unified IPsec policy definition│  policy_engine.py            │
+
+- **controller/policy_engine.py** - Orchestrator and validator│  - Loads & validates policy  │
+
+- **adapters/** - OS-specific implementations│  - Detects OS                │
+
+- **installer/** - Automated deployment scripts│  - Calls adapter             │
+
+- **services/** - Auto-start configurations│  - Logs tunnel status        │
+
+└────────────┬─────────────────┘
+
+## Key Features             │
+
+    ┌────────┼────────┬──────────┐
+
+✅ **All IPsec Modes Supported**    ▼        ▼        ▼          ▼
+
+- Tunnel mode (site-to-site)  Linux   Windows  macOS      BOSS OS
+
+- Transport mode (host-to-host)strongSwan PowerShell setkey  IKE Module
+
+- AH (authentication-only)```
+
+- ESP+AH (combined encryption and authentication)
 
 ### Components
 
-#### 1. **Controller** (`controller/`)
-- `policy.yaml` - Unified policy definition
-- `policy_engine.py` - Main orchestrator
-- `validator.py` - Policy validation logic
+✅ **Flexible Configuration**
 
-#### 2. **Adapters** (`adapters/`)
-- `linux/strongswan_adapter.py` - Generates strongSwan configs
-- `windows/windows_ipsec.ps1` - Creates Windows IPsec rules
-- `macos/macos_ipsec.sh` - Prototype stub for macOS
+- IKEv1 and IKEv2 support- **controller/policy.yaml** - Unified policy definition
 
-#### 3. **Installer** (`installer/`)
-- `install_linux.sh` - Linux installation script
-- `install_windows.ps1` - Windows installation script
-- `install_macos.sh` - macOS installation script
+- Multiple encryption algorithms (AES-128, AES-192, AES-256, 3DES)- **controller/policy_engine.py** - Main orchestrator
 
-#### 4. **Services** (`services/`)
-- `unified-ipsec.service` - systemd service for auto-start
+- Multiple integrity algorithms (SHA-1, SHA-256, SHA-384, SHA-512, MD5)- **controller/validator.py** - Configuration validation
 
-## 📦 Installation
+- PSK and certificate-based authentication (PSK fully implemented)- **adapters/** - OS-specific implementations
 
-### Linux (Ubuntu/Debian/CentOS/RHEL)
+- Configurable DH groups- **installer/** - Deployment scripts
 
-```bash
-# Clone or extract the project
+- **services/unified-ipsec.service** - Linux auto-start
+
+✅ **Automatic Operation**
+
+- Auto-start on system boot## Installation
+
+- Automatic tunnel initialization and recovery
+
+- Comprehensive logging of tunnel status and events### Linux (Ubuntu/Debian/CentOS/RHEL)
+
+- Configuration validation before deployment```bash
+
 cd unified-ipsec
 
-# Run installer as root
-sudo ./installer/install_linux.sh
-```
+✅ **Cross-Platform**sudo ./installer/install_linux.sh
 
-**What it does:**
-- Installs Python 3 and PyYAML (if needed)
-- Optionally installs strongSwan
-- Copies files to `/opt/unified-ipsec`
-- Creates systemd service
-- Adds `unified-ipsec` command to PATH
+- Single policy for all operating systems```
 
-### Windows (PowerShell as Administrator)
+- Platform-specific adapters handle OS differences
+
+- Uniform security parameters across network### Windows (PowerShell as Administrator)
 
 ```powershell
-# Navigate to project directory
-cd unified-ipsec
 
-# Allow script execution (if needed)
+## Installationcd unified-ipsec
+
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 
-# Run installer
+### Linux (Ubuntu/Debian/CentOS/RHEL/BOSS).\installer\install_windows.ps1
+
+```bash```
+
+cd unified-ipsec
+
+sudo ./installer/install_linux.sh### macOS
+
+``````bash
+
+cd unified-ipsec
+
+### Windows (PowerShell as Administrator)sudo ./installer/install_macos.sh
+
+```powershell```
+
+cd unified-ipsec
+
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process## Configuration
+
 .\installer\install_windows.ps1
-```
 
-**What it does:**
-- Checks for Python 3 and PyYAML
-- Copies files to `C:\Program Files\UnifiedIPsec`
-- Creates scheduled task for auto-start
-- Adds to system PATH
+```Edit `controller/policy.yaml`:
 
-### macOS
 
-```bash
-# Clone or extract the project
-cd unified-ipsec
 
-# Run installer as root
-sudo ./installer/install_macos.sh
-```
+### macOS```yaml
 
-**What it does:**
-- Checks for Python 3 and PyYAML
-- Copies files to `/usr/local/unified-ipsec`
-- Creates LaunchDaemon for auto-start
-- Adds `unified-ipsec` command to PATH
+```bashglobal:
 
-## 🚀 Usage
+cd unified-ipsec  ike_version: ikev2
 
-### 1. Edit Policy
+sudo ./installer/install_macos.sh  auth_method: psk
 
-Edit the unified policy file:
+```  psk: "shared_secret_key"
 
-**Linux/macOS:**
-```bash
-sudo nano /opt/unified-ipsec/controller/policy.yaml
-# or
-sudo nano /usr/local/unified-ipsec/controller/policy.yaml
-```
+  encryption: aes256
 
-**Windows:**
-```powershell
-notepad "C:\Program Files\UnifiedIPsec\controller\policy.yaml"
-```
+## Configuration  integrity: sha256
 
-### 2. Policy Format
+  dh_group: 14
 
-```yaml
-global:
-  ike_version: ikev2          # IKE version
-  auth_method: psk            # Authentication method
-  psk: "demo_shared_key"      # Pre-shared key
-  encryption: aes256          # Encryption algorithm
-  integrity: sha256           # Integrity algorithm
-  dh_group: 14                # Diffie-Hellman group
-  auto_start: true            # Start tunnels automatically
+Edit `controller/policy.yaml` to define your IPsec policies:  auto_start: true
 
-tunnels:
-  - name: site_to_site        # Tunnel name
-    mode: tunnel              # tunnel or transport
-    protocol: esp             # esp or ah
-    local_subnet: 10.0.0.0/24
-    remote_subnet: 192.168.1.0/24
-    peer_ip: 203.0.113.10
 
-  - name: host_to_host
-    mode: transport
+
+```yamltunnels:
+
+global:  # Site-to-site tunnel (ESP Tunnel Mode)
+
+  ike_version: ikev2           # IKE protocol version  - name: site_to_site
+
+  auth_method: psk             # Authentication method    mode: tunnel
+
+  psk: "shared_secret_key"     # Pre-shared key    protocol: esp
+
+  encryption: aes256           # Encryption algorithm    local_subnet: 10.0.0.0/24
+
+  integrity: sha256            # Integrity algorithm    remote_subnet: 192.168.1.0/24
+
+  dh_group: 14                 # Diffie-Hellman group    peer_ip: 203.0.113.10
+
+  auto_start: true             # Auto-start on boot
+
+  # Host-to-host (ESP Transport Mode)
+
+tunnels:  - name: host_to_host
+
+  # Site-to-site tunnel (ESP Tunnel Mode)    mode: transport
+
+  - name: site_to_site    protocol: esp
+
+    mode: tunnel    peer_ip: 203.0.113.20
+
     protocol: esp
-    peer_ip: 203.0.113.20
+
+    local_subnet: 10.0.0.0/24  # AH Tunnel Mode (authentication-only)
+
+    remote_subnet: 192.168.1.0/24  - name: auth_tunnel
+
+    peer_ip: 203.0.113.10    mode: tunnel
+
+    protocol: ah
+
+  # Host-to-host (ESP Transport Mode)    local_subnet: 10.1.0.0/24
+
+  - name: host_to_host    remote_subnet: 192.168.2.0/24
+
+    mode: transport    peer_ip: 203.0.113.30
+
+    protocol: esp
+
+    peer_ip: 203.0.113.20  # ESP + AH Combined (encryption + dual authentication)
+
+  - name: combined_tunnel
+
+  # AH Tunnel Mode (authentication-only)    mode: tunnel
+
+  - name: auth_tunnel    protocol: esp-ah
+
+    mode: tunnel    local_subnet: 10.2.0.0/24
+
+    protocol: ah    remote_subnet: 192.168.3.0/24
+
+    local_subnet: 10.1.0.0/24    peer_ip: 203.0.113.40
+
+    remote_subnet: 192.168.2.0/24```
+
+    peer_ip: 203.0.113.30
+
+## Usage
+
+  # ESP + AH Combined
+
+  - name: combined_tunnel### Validate Configuration
+
+    mode: tunnel```bash
+
+    protocol: esp-ahpython3 controller/validator.py
+
+    local_subnet: 10.2.0.0/24```
+
+    remote_subnet: 192.168.3.0/24
+
+    peer_ip: 203.0.113.40### Deploy Policy
+
+``````bash
+
+# Linux/macOS
+
+## Usagesudo python3 controller/policy_engine.py
+
+
+
+### Validate Configuration# Windows
+
+```bashpython "C:\Program Files\UnifiedIPsec\controller\policy_engine.py"
+
+python3 controller/validator.py```
+
 ```
 
-### 3. Run Manually
+### View Status
 
-**Linux:**
-```bash
-sudo unified-ipsec
-# or
-sudo python3 /opt/unified-ipsec/controller/policy_engine.py
+### Deploy Policy```bash
+
+```bash# Linux
+
+# Linux/macOSsudo systemctl status unified-ipsec
+
+sudo python3 controller/policy_engine.pysudo journalctl -u unified-ipsec -f
+
+
+
+# Windows# Windows
+
+python "C:\Program Files\UnifiedIPsec\controller\policy_engine.py"Get-ScheduledTask -TaskName UnifiedIPsec
+
 ```
 
-**Windows (as Administrator):**
-```powershell
-unified-ipsec.bat
-# or
-python "C:\Program Files\UnifiedIPsec\controller\policy_engine.py"
-```
+# macOS
 
-**macOS:**
-```bash
-sudo unified-ipsec
-# or
-sudo python3 /usr/local/unified-ipsec/controller/policy_engine.py
-```
+### View Status and Logssudo launchctl list | grep unifiedipsec
 
-### 4. Service Management
+```bash```
 
-**Linux (systemd):**
-```bash
-# Start service
-sudo systemctl start unified-ipsec
+# Linux - Service status
 
-# Enable auto-start
-sudo systemctl enable unified-ipsec
+sudo systemctl status unified-ipsec### View Logs
 
-# Check status
-sudo systemctl status unified-ipsec
+sudo journalctl -u unified-ipsec -f```bash
 
-# View logs
-sudo journalctl -u unified-ipsec -f
-```
+# Linux/macOS
 
-**Windows (Scheduled Task):**
-```powershell
-# Start task
-Start-ScheduledTask -TaskName "UnifiedIPsec"
+# Linux/macOS - Application logstail -f logs/ipsec.log
 
-# Check status
-Get-ScheduledTask -TaskName "UnifiedIPsec" | Get-ScheduledTaskInfo
+tail -f logs/ipsec.log
 
-# View logs
-Get-Content "C:\Program Files\UnifiedIPsec\logs\ipsec.log" -Tail 50 -Wait
-```
+# Windows
 
-**macOS (LaunchDaemon):**
-```bash
-# Load daemon
-sudo launchctl load /Library/LaunchDaemons/com.unifiedipsec.plist
+# Windows - Task statusGet-Content "C:\Program Files\UnifiedIPsec\logs\ipsec.log" -Tail 50 -Wait
 
-# Start manually
-sudo launchctl start com.unifiedipsec
+Get-ScheduledTask -TaskName UnifiedIPsec```
 
-# View logs
-tail -f /usr/local/unified-ipsec/logs/ipsec.log
-```
 
-## 🧪 Demo: Testing Encrypted Traffic
 
-### Scenario: Site-to-Site Tunnel
+# macOS - Daemon status## Supported Configurations
 
-1. **Setup two Linux VMs** (or cloud instances)
-   - VM1: 10.0.0.10 (local subnet: 10.0.0.0/24)
-   - VM2: 192.168.1.10 (remote subnet: 192.168.1.0/24)
-
-2. **Install on both VMs:**
-   ```bash
-   sudo ./installer/install_linux.sh
-   ```
-
-3. **Configure VM1** (`policy.yaml`):
-   ```yaml
-   global:
-     ike_version: ikev2
-     auth_method: psk
-     psk: "shared_secret_key_123"
-     encryption: aes256
-     integrity: sha256
-     dh_group: 14
-     auto_start: true
-
-   tunnels:
-     - name: site_to_site
-       mode: tunnel
-       protocol: esp
-       local_subnet: 10.0.0.0/24
-       remote_subnet: 192.168.1.0/24
-       peer_ip: <VM2_PUBLIC_IP>
-   ```
-
-4. **Configure VM2** (mirror configuration):
-   ```yaml
-   tunnels:
-     - name: site_to_site
-       mode: tunnel
-       protocol: esp
-       local_subnet: 192.168.1.0/24
-       remote_subnet: 10.0.0.0/24
-       peer_ip: <VM1_PUBLIC_IP>
-   ```
-
-5. **Apply configuration:**
-   ```bash
-   # On both VMs
-   sudo unified-ipsec
-   ```
-
-6. **Verify tunnel establishment:**
-   ```bash
-   # Check IPsec status
-   sudo ipsec status
-
-   # Monitor traffic
-   sudo tcpdump -i any esp
-   ```
-
-7. **Test encrypted connectivity:**
-   ```bash
-   # From VM1, ping VM2's private IP
-   ping 192.168.1.10
-
-   # You should see ESP packets in tcpdump
-   ```
-
-### Scenario: Transport Mode (Host-to-Host)
-
-1. **Configure for direct host encryption:**
-   ```yaml
-   tunnels:
-     - name: secure_comms
-       mode: transport
-       protocol: esp
-       peer_ip: <REMOTE_HOST_IP>
-   ```
-
-2. **Run on both hosts:**
-   ```bash
-   sudo unified-ipsec
-   ```
-
-3. **Test:**
-   ```bash
-   # SSH should now be encrypted within ESP
-   ssh user@<REMOTE_HOST_IP>
-
-   # Verify ESP traffic
-   sudo tcpdump -i any esp
-   ```
-
-## 📊 Supported Configurations
-
-### IKE Versions
-- ✅ IKEv2 (primary)
-- ⚠️ IKEv1 (structure supports, not fully tested)
-
-### Authentication Methods
-- ✅ Pre-shared Key (PSK)
-- ⚠️ Certificates (structure supports, adapters need extension)
-
-### Encryption Algorithms
-- ✅ AES-128, AES-192, AES-256
-- ✅ 3DES
-
-### Integrity Algorithms
-- ✅ SHA-1, SHA-256, SHA-384, SHA-512
-- ✅ MD5
-
-### DH Groups
-- ✅ 2, 5, 14, 15, 16, 17, 18, 19, 20, 21
-
-### Modes
-- ✅ Tunnel mode (site-to-site)
-- ✅ Transport mode (host-to-host)
-
-### Protocols
-- ✅ ESP (Encapsulating Security Payload)
-- ⚠️ AH (Authentication Header - structure supports, not implemented)
-
-## 🔍 Troubleshooting
-
-### Linux
-
-**Problem:** strongSwan not installed
-```bash
-# Ubuntu/Debian
-sudo apt-get install strongswan
-
-# CentOS/RHEL
-sudo yum install strongswan
-```
-
-**Problem:** Tunnel not establishing
-```bash
-# Check strongSwan status
-sudo ipsec status
-
-# View detailed logs
-sudo journalctl -u strongswan -f
-
-# Verify configuration
-sudo ipsec verify
-```
-
-**Problem:** Permission denied
-```bash
-# Ensure running as root
-sudo unified-ipsec
-```
-
-### Windows
-
-**Problem:** PowerShell execution policy
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
-```
-
-**Problem:** IPsec rules not applying
-```powershell
-# Check Windows Firewall service
-Get-Service mpssvc
-
-# View IPsec rules
-Get-NetIPsecRule
-
-# Check IPsec SAs
-Get-NetIPsecMainModeSA
-Get-NetIPsecQuickModeSA
-```
-
-**Problem:** Python not found
-- Install Python 3 from https://www.python.org/
-- Check "Add Python to PATH" during installation
-
-### macOS
-
-**Problem:** LaunchDaemon not starting
-```bash
-# Check daemon status
 sudo launchctl list | grep unifiedipsec
 
-# View daemon logs
-cat /usr/local/unified-ipsec/logs/stderr.log
+```### IPsec Modes
+
+- ✅ **Tunnel Mode** (site-to-site, subnet-to-subnet)
+
+## Testing- ✅ **Transport Mode** (host-to-host)
+
+
+
+### Demo (Non-Destructive)### IPsec Protocols
+
+```bash- ✅ **ESP** (Encapsulating Security Payload) - encryption + integrity
+
+./demo.sh- ✅ **AH** (Authentication Header) - integrity only
+
+```- ✅ **ESP+AH** (Combined) - encryption + dual authentication
+
+
+
+### Test Encrypted Traffic (Linux)### Encryption Algorithms
+
+```bash- AES-128, AES-192, AES-256, 3DES
+
+# Terminal 1: Monitor ESP packets
+
+sudo tcpdump -i any esp### Integrity Algorithms
+
+- SHA-1, SHA-256, SHA-384, SHA-512, MD5
+
+# Terminal 2: Configure and deploy
+
+sudo python3 controller/policy_engine.py### Key Exchange
+
+- IKEv1, IKEv2
+
+# Terminal 3: Generate traffic through tunnel- DH Groups: 2, 5, 14, 15, 16, 17, 18, 19, 20, 21
+
+ping <remote_subnet_ip>
+
+### Authentication Methods
+
+# Terminal 1 should show ESP packets indicating encryption- Pre-Shared Key (PSK)
+
+```- Certificate-based (structure supported)
+
+
+
+## Supported Configurations## 🔍 Troubleshooting
+
+
+
+| Category | Supported |### Linux
+
+|----------|-----------|
+
+| **IPsec Modes** | Tunnel, Transport |**Problem:** strongSwan not installed
+
+| **Protocols** | ESP, AH, ESP+AH |```bash
+
+| **Encryption** | AES-128, AES-192, AES-256, 3DES |# Ubuntu/Debian
+
+| **Integrity** | SHA-1, SHA-256, SHA-384, SHA-512, MD5 |sudo apt-get install strongswan
+
+| **Key Exchange** | IKEv1, IKEv2 |
+
+| **DH Groups** | 2, 5, 14, 15, 16, 17, 18, 19, 20, 21 |# CentOS/RHEL
+
+| **Authentication** | PSK (fully), Certificates (structure) |sudo yum install strongswan
+
 ```
 
-**Problem:** jq not found
+## Limitations
+
+**Problem:** Tunnel not establishing
+
+- **macOS adapter** is a prototype stub demonstrating concepts```bash
+
+- **Certificate authentication** structure exists, adapters need extension# Check strongSwan status
+
+- **AH protocol** validator accepts it, adapters need implementationsudo ipsec status
+
+- **Linux-focused**: Primary development on strongSwan
+
+# View detailed logs
+
+## File Structuresudo journalctl -u strongswan -f
+
+
+
+```# Verify configuration
+
+controller/sudo ipsec verify
+
+├── policy.yaml              # Unified policy definition```
+
+├── policy_engine.py         # Main orchestrator
+
+└── validator.py             # Configuration validator**Problem:** Permission denied
+
+```bash
+
+adapters/# Ensure running as root
+
+├── linux/strongswan_adapter.pysudo unified-ipsec
+
+├── windows/windows_ipsec.ps1```
+
+├── macos/macos_ipsec.sh
+
+└── boss_os/boss_adapter.py### Windows
+
+
+
+installer/**Problem:** PowerShell execution policy
+
+├── install_linux.sh```powershell
+
+├── install_windows.ps1Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+
+└── install_macos.sh```
+
+
+
+services/**Problem:** IPsec rules not applying
+
+└── unified-ipsec.service    # systemd auto-start```powershell
+
+# Check Windows Firewall service
+
+demo.sh                       # Non-destructive demoGet-Service mpssvc
+
+logs/                         # Runtime logs
+
+```# View IPsec rules
+
+Get-NetIPsecRule
+
+## License
+
+# Check IPsec SAs
+
+MIT License - see LICENSE file for detailsGet-NetIPsecMainModeSA
+
+Get-NetIPsecQuickModeSA
+
+## Contributing```
+
+
+
+Contributions welcome! Focus areas:**Problem:** Python not found
+
+- macOS adapter completion- Install Python 3 from https://www.python.org/
+
+- Certificate-based authentication- Check "Add Python to PATH" during installation
+
+- Windows advanced IPsec configurations
+
+- Performance optimization### macOS
+
+- Additional OS support
+
+**Problem:** LaunchDaemon not starting
+
+## Quick Start```bash
+
+# Check daemon status
+
+1. **Install**: Run installer for your OSsudo launchctl list | grep unifiedipsec
+
+2. **Configure**: Edit `policy.yaml`
+
+3. **Validate**: Run `python3 controller/validator.py`# View daemon logs
+
+4. **Deploy**: Run `python3 controller/policy_engine.py`cat /usr/local/unified-ipsec/logs/stderr.log
+
+5. **Verify**: Check logs and tunnel status```
+
+
+
+For detailed information, see QUICKSTART.md**Problem:** jq not found
+
 ```bash
 # Install via Homebrew
 brew install jq
