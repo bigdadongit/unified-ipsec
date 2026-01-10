@@ -93,9 +93,56 @@ class PolicyEngine:
         try:
             PolicyValidator.validate(self.config)
             self.logger.info("✓ Policy validation passed")
+            
+            # Log IPsec mode information
+            self._log_ipsec_modes()
         except ValidationError as e:
             self.logger.error(f"✗ Policy validation failed: {e}")
             raise
+    
+    def _log_ipsec_modes(self):
+        """Log information about IPsec modes being used"""
+        self.logger.info("-" * 60)
+        self.logger.info("IPsec Configuration Summary:")
+        self.logger.info(f"  IKE Version: {self.config['global'].get('ike_version', 'unknown').upper()}")
+        self.logger.info(f"  Encryption: {self.config['global'].get('encryption', 'unknown')}")
+        self.logger.info(f"  Integrity: {self.config['global'].get('integrity', 'unknown')}")
+        self.logger.info(f"  Auto-start: {'Yes' if self.config['global'].get('auto_start') else 'No'}")
+        self.logger.info("")
+        self.logger.info("Tunnels:")
+        
+        for tunnel in self.config.get('tunnels', []):
+            enabled = tunnel.get('enabled', True)
+            status = "✓ ENABLED" if enabled else "✗ DISABLED"
+            
+            name = tunnel.get('name', 'unknown')
+            mode = tunnel.get('mode', 'unknown')
+            protocol = tunnel.get('protocol', 'unknown')
+            peer = tunnel.get('peer_ip', 'unknown')
+            
+            self.logger.info(f"  [{status}] {name}")
+            self.logger.info(f"    Mode: {mode.upper()} | Protocol: {protocol.upper()} | Peer: {peer}")
+            
+            # Log mode-specific details
+            if mode == 'tunnel':
+                local = tunnel.get('local_subnet', 'N/A')
+                remote = tunnel.get('remote_subnet', 'N/A')
+                self.logger.info(f"    Subnets: {local} <-> {remote}")
+                self.logger.info(f"    Type: Site-to-Site (Tunnel encapsulates entire IP packet)")
+            elif mode == 'transport':
+                self.logger.info(f"    Type: Host-to-Host (Transport mode, original IP header)")
+            
+            # Log protocol details
+            if protocol == 'esp':
+                self.logger.info(f"    Security: Encryption + Integrity (ESP)")
+            elif protocol == 'ah':
+                self.logger.info(f"    Security: Integrity + Authentication only (AH - no encryption)")
+            elif protocol == 'esp-ah':
+                self.logger.info(f"    Security: Encryption + Integrity + Authentication (ESP+AH)")
+            
+            self.logger.info("")
+        
+        self.logger.info("-" * 60)
     
     def call_adapter(self, os_type: str):
         """Call the appropriate OS adapter"""
@@ -207,9 +254,28 @@ class PolicyEngine:
             # Validate policy
             self.validate_policy()
             
+            # Log tunnel initialization
+            self.logger.info("")
+            self.logger.info("Initializing IPsec tunnels...")
+            for tunnel in self.config.get('tunnels', []):
+                if tunnel.get('enabled', True):
+                    name = tunnel.get('name', 'unknown')
+                    self.logger.info(f"  → [INIT] Tunnel '{name}' starting...")
+            
             # Call adapter
             self.call_adapter(os_type)
             
+            # Log tunnel status after deployment
+            self.logger.info("")
+            self.logger.info("Tunnel Status After Deployment:")
+            for tunnel in self.config.get('tunnels', []):
+                if tunnel.get('enabled', True):
+                    name = tunnel.get('name', 'unknown')
+                    mode = tunnel.get('mode', 'unknown')
+                    # In prototype, show as "CONFIGURED" since we can't verify real tunnel state without root
+                    self.logger.info(f"  ✓ [CONFIGURED] Tunnel '{name}' ({mode}) - ready to establish")
+            
+            self.logger.info("")
             self.logger.info("=" * 60)
             self.logger.info("✓ POLICY ENGINE COMPLETED SUCCESSFULLY")
             self.logger.info("=" * 60)

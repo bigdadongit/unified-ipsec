@@ -21,8 +21,15 @@ class PolicyValidator:
     VALID_ENCRYPTIONS = ['aes128', 'aes192', 'aes256', '3des']
     VALID_INTEGRITIES = ['sha1', 'sha256', 'sha384', 'sha512', 'md5']
     VALID_DH_GROUPS = [2, 5, 14, 15, 16, 17, 18, 19, 20, 21]
+    
+    # IPsec Modes: tunnel (site-to-site) or transport (host-to-host)
     VALID_MODES = ['tunnel', 'transport']
-    VALID_PROTOCOLS = ['esp', 'ah']
+    
+    # IPsec Protocols: esp (encryption), ah (auth-only), esp-ah (both)
+    # - esp:     Encapsulating Security Payload (encryption + integrity)
+    # - ah:      Authentication Header (integrity/authentication only)
+    # - esp-ah:  Combined mode (encryption + integrity + authentication)
+    VALID_PROTOCOLS = ['esp', 'ah', 'esp-ah']
     
     @staticmethod
     def validate_global(config: Dict[str, Any]) -> None:

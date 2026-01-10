@@ -1,18 +1,22 @@
 [Unit]
 Description=Unified IPsec Policy Engine
-Documentation=https://github.com/yourusername/unified-ipsec
+Documentation=https://github.com/ski69per/unified-ipsec
+# Ensure network is available before starting IPsec
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=oneshot
+# Run the policy engine on startup
 ExecStart=/usr/bin/python3 /opt/unified-ipsec/controller/policy_engine.py
+# Keep service active after execution
 RemainAfterExit=yes
+# Log to systemd journal
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=unified-ipsec
 
-# Restart configuration
+# Restart on failure
 Restart=on-failure
 RestartSec=30s
 
@@ -24,4 +28,6 @@ PrivateTmp=true
 WorkingDirectory=/opt/unified-ipsec
 
 [Install]
+# Start in multi-user target (normal system boot)
 WantedBy=multi-user.target
+

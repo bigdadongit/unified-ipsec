@@ -1,24 +1,116 @@
+# ============================================================================
 # Unified IPsec Policy Configuration
 # This policy is automatically translated to platform-specific configs
+# across Linux (strongSwan), Windows (IPsec), macOS, and Boss OS
+# ============================================================================
 
+# ============================================================================
+# GLOBAL CONFIGURATION
+# ============================================================================
 global:
+  # IKE Protocol Version
+  # Supported: ikev1, ikev2
   ike_version: ikev2
+  
+  # Authentication Method
+  # Supported: psk (Pre-Shared Key), cert (Certificate), rsa (RSA)
   auth_method: psk
+  
+  # Pre-Shared Key (for PSK authentication)
+  # WARNING: This is a demo key. Use proper key management in production
   psk: "demo_shared_key"
+  
+  # Encryption Algorithm for IPsec tunnels
+  # Supported: aes128, aes192, aes256, 3des
   encryption: aes256
+  
+  # Integrity/Authentication Algorithm for IPsec
+  # Supported: sha1, sha256, sha384, sha512, md5
   integrity: sha256
+  
+  # Diffie-Hellman Group for IKE key exchange
+  # Supported: 2, 5, 14, 15, 16, 17, 18, 19, 20, 21
   dh_group: 14
+  
+  # Auto-start on system boot
   auto_start: true
 
+# ============================================================================
+# TUNNELS AND TRANSPORT ASSOCIATIONS
+# Supports both tunnel and transport modes with ESP/AH protocols
+# ============================================================================
 tunnels:
+  # Example 1: Site-to-Site Tunnel (ESP Tunnel Mode)
+  # Protects traffic between two subnets
+  # IPsec mode: Tunnel (encapsulates entire packets)
+  # Protocol: ESP (Encapsulating Security Payload)
   - name: site_to_site
-    mode: tunnel
-    protocol: esp
-    local_subnet: 10.0.0.0/24
-    remote_subnet: 192.168.1.0/24
-    peer_ip: 203.0.113.10
+    mode: tunnel                           # tunnel or transport
+    protocol: esp                          # esp, ah, or esp-ah (combined)
+    local_subnet: 10.0.0.0/24              # Protected traffic (source)
+    remote_subnet: 192.168.1.0/24          # Protected traffic (destination)
+    peer_ip: 203.0.113.10                  # IPsec gateway peer IP
+    description: "Tunnel between Site A (10.0.0.0/24) and Site B (192.168.1.0/24)"
 
+  # Example 2: Host-to-Host Transport Mode (ESP Transport Mode)
+  # Protects traffic between two specific hosts
+  # IPsec mode: Transport (does not add new IP header)
+  # Protocol: ESP (Encapsulating Security Payload)
   - name: host_to_host
-    mode: transport
+    mode: transport                        # transport mode = host-to-host
     protocol: esp
     peer_ip: 203.0.113.20
+    description: "Host-to-host transport mode protecting traffic between hosts"
+
+  # Example 3: AH Tunnel Mode (Authentication Header - Stub)
+  # Demonstrates support for AH protocol
+  # NOTE: AH is demonstrated here. In production, ESP is preferred for confidentiality.
+  # This tunnel would authenticate but NOT encrypt traffic.
+  - name: ah_tunnel_example
+    mode: tunnel
+    protocol: ah                           # AH provides authentication only, not encryption
+    local_subnet: 10.1.0.0/24
+    remote_subnet: 192.168.2.0/24
+    peer_ip: 203.0.113.30
+    description: "AH tunnel mode - demonstrates authentication-only mode (non-confidential)"
+    enabled: false                         # Disabled for demo - uncomment to enable
+
+  # Example 4: Combined ESP+AH Mode (Structure Only)
+  # Demonstrates support for combined encryption and authentication
+  # Structure shows that all modes are supported
+  - name: esp_ah_combined_example
+    mode: tunnel
+    protocol: esp-ah                       # Combined ESP+AH provides both encryption and authentication
+    local_subnet: 10.2.0.0/24
+    remote_subnet: 192.168.3.0/24
+    peer_ip: 203.0.113.40
+    description: "Combined ESP+AH providing encryption and additional authentication"
+    enabled: false                         # Disabled for demo - uncomment to enable
+
+# ============================================================================
+# SUPPORTED IPSEC MODES AND PROTOCOLS
+# ============================================================================
+# 
+# MODE DEFINITIONS:
+# ├─ tunnel:     Encapsulates entire IP packet (site-to-site)
+# │              New IP header added
+# │              Protects subnets behind gateways
+# │
+# └─ transport:  Only payload is encrypted (host-to-host)
+#                Original IP header preserved
+#                Protects direct host communication
+#
+# PROTOCOL DEFINITIONS:
+# ├─ esp:        Encapsulating Security Payload
+# │              Provides: Confidentiality (encryption) + Integrity
+# │              Recommended for most use cases
+# │
+# ├─ ah:         Authentication Header
+# │              Provides: Integrity + Authentication only
+# │              Does NOT provide confidentiality
+# │
+# └─ esp-ah:     Combined ESP and AH
+#                Provides: Confidentiality + Integrity + Authentication
+#                Maximum security, slight performance overhead
+#
+# ============================================================================
