@@ -8,263 +8,525 @@
 
 
 
-A unified IPsec solution for enterprises to automatically encrypt network traffic across Windows, Linux (Ubuntu/Debian/RHEL/BOSS), and macOS using centrally defined policies.A unified IPsec solution for enterprises to automatically encrypt network traffic across Windows, Linux (Ubuntu/Debian/RHEL/BOSS), and macOS using centrally defined policies.
+A unified IPsec solution for enterprises to automatically encrypt network traffic across Windows, Linux (Ubuntu/Debian/RHEL/BOSS), and macOS using centrally defined policies.
 
 
 
-## Problem Statement## Problem Statement
+## Problem StatementA unified IPsec solution for enterprises to automatically encrypt network traffic across Windows, Linux (Ubuntu/Debian/RHEL/BOSS), and macOS using centrally defined policies.A unified IPsec solution for enterprises to automatically encrypt network traffic across Windows, Linux (Ubuntu/Debian/RHEL/BOSS), and macOS using centrally defined policies.
 
 
 
-Enterprise networks consist of diverse operating systems (Windows, Linux, macOS, BOSS) requiring consistent encryption policies. Currently:Enterprise networks consist of diverse operating systems (Windows, Linux, macOS, BOSS) requiring consistent encryption policies. Currently:
+Enterprise networks consist of diverse operating systems (Windows, Linux, macOS, BOSS) requiring consistent encryption policies. Currently:
 
-- **Linux** uses strongSwan with `ipsec.conf`- **Linux** uses strongSwan with `ipsec.conf`
+- **Linux** uses strongSwan with `ipsec.conf`
 
-- **Windows** uses PowerShell cmdlets and IPsec rules- **Windows** uses PowerShell cmdlets and IPsec rules
+- **Windows** uses PowerShell cmdlets and IPsec rules## Problem Statement## Problem Statement
 
-- **macOS** uses racoon or IKEv2 profiles- **macOS** uses racoon or IKEv2 profiles
+- **macOS** uses racoon or IKEv2 profiles
 
-- **BOSS OS** requires custom kernel module integration- **BOSS OS** requires custom kernel module integration
+- **BOSS OS** requires custom kernel module integration
 
 
 
-This fragmentation leads to configuration inconsistencies, security gaps, deployment delays, and operational complexity.This fragmentation leads to:
+This fragmentation leads to:Enterprise networks consist of diverse operating systems (Windows, Linux, macOS, BOSS) requiring consistent encryption policies. Currently:Enterprise networks consist of diverse operating systems (Windows, Linux, macOS, BOSS) requiring consistent encryption policies. Currently:
 
 - Configuration inconsistencies and security gaps
 
-## Solution- Deployment delays and operational complexity
+- Deployment delays and operational complexity- **Linux** uses strongSwan with `ipsec.conf`- **Linux** uses strongSwan with `ipsec.conf`
 
 - Manual configuration on each device
 
-**Unified IPsec** provides:- Lack of centralized policy management
+- Lack of centralized policy management- **Windows** uses PowerShell cmdlets and IPsec rules- **Windows** uses PowerShell cmdlets and IPsec rules
 
-1. **Single policy file** (`policy.yaml`) deployed across all operating systems
 
-2. **Automatic encryption** of traffic based on centrally defined policies## Solution
+
+## Solution- **macOS** uses racoon or IKEv2 profiles- **macOS** uses racoon or IKEv2 profiles
+
+
+
+**Unified IPsec** provides:- **BOSS OS** requires custom kernel module integration- **BOSS OS** requires custom kernel module integration
+
+1. **Single policy file** (`policy.yaml`) deployed to all operating systems
+
+2. **Automatic encryption** of traffic based on centrally defined policies
 
 3. **Zero-touch deployment** with auto-start on boot
 
-4. **Complete IPsec mode support** (ESP Tunnel, ESP Transport, AH Tunnel, AH Transport, ESP+AH)**Unified IPsec** provides:
-
-5. **Multi-tunnel capability** for different peers and subnets1. **Single policy file** (`policy.yaml`) deployed to all operating systems
-
-6. **Comprehensive logging** for tunnel status and troubleshooting2. **Automatic encryption** of traffic based on centrally defined policies
-
-3. **Zero-touch deployment** with auto-start on boot
-
-## Architecture4. **Complete IPsec mode support** (ESP Tunnel, ESP Transport, AH Tunnel, AH Transport, ESP+AH)
+4. **Complete IPsec mode support** (ESP Tunnel, ESP Transport, AH Tunnel, AH Transport, ESP+AH)This fragmentation leads to configuration inconsistencies, security gaps, deployment delays, and operational complexity.This fragmentation leads to:
 
 5. **Multi-tunnel capability** for different peers and subnets
 
-```
+6. **Comprehensive logging** for tunnel status and troubleshooting- Configuration inconsistencies and security gaps
+
+
+
+## Architecture## Solution- Deployment delays and operational complexity
+
+
+
+```- Manual configuration on each device
+
+Policy Definition (policy.yaml)
+
+          ↓**Unified IPsec** provides:- Lack of centralized policy management
+
+Policy Engine (policy_engine.py)
+
+          ↓1. **Single policy file** (`policy.yaml`) deployed across all operating systems
+
+    Platform Detection
+
+          ↓2. **Automatic encryption** of traffic based on centrally defined policies## Solution
+
+    ┌─────┬─────┬──────┐
+
+    ▼     ▼     ▼      ▼3. **Zero-touch deployment** with auto-start on boot
+
+  Linux Windows macOS BOSS OS
+
+```4. **Complete IPsec mode support** (ESP Tunnel, ESP Transport, AH Tunnel, AH Transport, ESP+AH)**Unified IPsec** provides:
+
+
+
+### Components5. **Multi-tunnel capability** for different peers and subnets1. **Single policy file** (`policy.yaml`) deployed to all operating systems
+
+
+
+- **controller/policy.yaml** - Unified policy definition6. **Comprehensive logging** for tunnel status and troubleshooting2. **Automatic encryption** of traffic based on centrally defined policies
+
+- **controller/policy_engine.py** - Main orchestrator and validator
+
+- **controller/validator.py** - Configuration validation3. **Zero-touch deployment** with auto-start on boot
+
+- **adapters/** - OS-specific implementations
+
+  - `linux/strongswan_adapter.py` - strongSwan configuration## Architecture4. **Complete IPsec mode support** (ESP Tunnel, ESP Transport, AH Tunnel, AH Transport, ESP+AH)
+
+  - `windows/windows_ipsec.ps1` - Windows IPsec deployment
+
+  - `macos/macos_ipsec.sh` - macOS IKEv2 configuration5. **Multi-tunnel capability** for different peers and subnets
+
+  - `boss_os/boss_adapter.py` - BOSS OS kernel integration
+
+- **installer/** - Deployment scripts for each OS```
+
+- **services/unified-ipsec.service** - Linux systemd auto-start
 
 Policy Definition (policy.yaml)## Architecture
 
+## Key Features
+
           ↓
 
-Policy Engine (policy_engine.py)```
+✅ **All IPsec Modes Supported**
 
-          ↓┌──────────────────────────────┐
+- Tunnel mode (site-to-site)Policy Engine (policy_engine.py)```
 
-    Platform Detection│   policy.yaml (Unified)      │
+- Transport mode (host-to-host)
 
-          ↓│  - IPsec modes & protocols   │
-
-    ┌─────┬─────┬──────┐│  - Encryption algorithms     │
-
-    ▼     ▼     ▼      ▼│  - Authentication methods    │
-
-  Linux Windows macOS BOSS OS└────────────┬─────────────────┘
-
-```             │
-
-             ▼
-
-**Components:**┌──────────────────────────────┐
-
-- **controller/policy.yaml** - Unified IPsec policy definition│  policy_engine.py            │
-
-- **controller/policy_engine.py** - Orchestrator and validator│  - Loads & validates policy  │
-
-- **adapters/** - OS-specific implementations│  - Detects OS                │
-
-- **installer/** - Automated deployment scripts│  - Calls adapter             │
-
-- **services/** - Auto-start configurations│  - Logs tunnel status        │
-
-└────────────┬─────────────────┘
-
-## Key Features             │
-
-    ┌────────┼────────┬──────────┐
-
-✅ **All IPsec Modes Supported**    ▼        ▼        ▼          ▼
-
-- Tunnel mode (site-to-site)  Linux   Windows  macOS      BOSS OS
-
-- Transport mode (host-to-host)strongSwan PowerShell setkey  IKE Module
-
-- AH (authentication-only)```
+- AH (authentication-only)          ↓┌──────────────────────────────┐
 
 - ESP+AH (combined encryption and authentication)
 
-### Components
+    Platform Detection│   policy.yaml (Unified)      │
 
 ✅ **Flexible Configuration**
 
-- IKEv1 and IKEv2 support- **controller/policy.yaml** - Unified policy definition
+- IKEv1 and IKEv2 support          ↓│  - IPsec modes & protocols   │
 
-- Multiple encryption algorithms (AES-128, AES-192, AES-256, 3DES)- **controller/policy_engine.py** - Main orchestrator
+- Multiple encryption algorithms (AES-128, AES-192, AES-256, 3DES)
 
-- Multiple integrity algorithms (SHA-1, SHA-256, SHA-384, SHA-512, MD5)- **controller/validator.py** - Configuration validation
+- Multiple integrity algorithms (SHA-1, SHA-256, SHA-384, SHA-512, MD5)    ┌─────┬─────┬──────┐│  - Encryption algorithms     │
 
-- PSK and certificate-based authentication (PSK fully implemented)- **adapters/** - OS-specific implementations
+- PSK and certificate-based authentication (PSK fully implemented)
 
-- Configurable DH groups- **installer/** - Deployment scripts
+- Configurable DH groups (2, 5, 14, 15, 16, 17, 18, 19, 20, 21)    ▼     ▼     ▼      ▼│  - Authentication methods    │
 
-- **services/unified-ipsec.service** - Linux auto-start
 
-✅ **Automatic Operation**
 
-- Auto-start on system boot## Installation
+✅ **Automatic Operation**  Linux Windows macOS BOSS OS└────────────┬─────────────────┘
 
-- Automatic tunnel initialization and recovery
+- Auto-start on system boot
 
-- Comprehensive logging of tunnel status and events### Linux (Ubuntu/Debian/CentOS/RHEL)
+- Automatic tunnel initialization and recovery```             │
 
-- Configuration validation before deployment```bash
+- Comprehensive logging of tunnel status and events
 
-cd unified-ipsec
+- Configuration validation before deployment             ▼
 
-✅ **Cross-Platform**sudo ./installer/install_linux.sh
 
-- Single policy for all operating systems```
 
-- Platform-specific adapters handle OS differences
+✅ **Cross-Platform****Components:**┌──────────────────────────────┐
 
-- Uniform security parameters across network### Windows (PowerShell as Administrator)
+- Single policy for all operating systems
 
-```powershell
+- Platform-specific adapters handle OS differences- **controller/policy.yaml** - Unified IPsec policy definition│  policy_engine.py            │
 
-## Installationcd unified-ipsec
+- Uniform security parameters across network
 
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+- **controller/policy_engine.py** - Orchestrator and validator│  - Loads & validates policy  │
 
-### Linux (Ubuntu/Debian/CentOS/RHEL/BOSS).\installer\install_windows.ps1
+## Installation
 
-```bash```
+- **adapters/** - OS-specific implementations│  - Detects OS                │
 
-cd unified-ipsec
+### Linux (Ubuntu/Debian/CentOS/RHEL/BOSS)
 
-sudo ./installer/install_linux.sh### macOS
-
-``````bash
+```bash- **installer/** - Automated deployment scripts│  - Calls adapter             │
 
 cd unified-ipsec
 
-### Windows (PowerShell as Administrator)sudo ./installer/install_macos.sh
+sudo ./installer/install_linux.sh- **services/** - Auto-start configurations│  - Logs tunnel status        │
 
-```powershell```
+```
+
+└────────────┬─────────────────┘
+
+### Windows (PowerShell as Administrator)
+
+```powershell## Key Features             │
 
 cd unified-ipsec
 
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process## Configuration
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process    ┌────────┼────────┬──────────┐
 
 .\installer\install_windows.ps1
 
-```Edit `controller/policy.yaml`:
+```✅ **All IPsec Modes Supported**    ▼        ▼        ▼          ▼
 
 
 
-### macOS```yaml
+### macOS- Tunnel mode (site-to-site)  Linux   Windows  macOS      BOSS OS
 
-```bashglobal:
+```bash
 
-cd unified-ipsec  ike_version: ikev2
+cd unified-ipsec- Transport mode (host-to-host)strongSwan PowerShell setkey  IKE Module
 
-sudo ./installer/install_macos.sh  auth_method: psk
+sudo ./installer/install_macos.sh
 
-```  psk: "shared_secret_key"
-
-  encryption: aes256
-
-## Configuration  integrity: sha256
-
-  dh_group: 14
-
-Edit `controller/policy.yaml` to define your IPsec policies:  auto_start: true
+```- AH (authentication-only)```
 
 
 
-```yamltunnels:
+## Configuration- ESP+AH (combined encryption and authentication)
 
-global:  # Site-to-site tunnel (ESP Tunnel Mode)
 
-  ike_version: ikev2           # IKE protocol version  - name: site_to_site
 
-  auth_method: psk             # Authentication method    mode: tunnel
+Edit `controller/policy.yaml` to define your IPsec policies:### Components
 
-  psk: "shared_secret_key"     # Pre-shared key    protocol: esp
 
-  encryption: aes256           # Encryption algorithm    local_subnet: 10.0.0.0/24
 
-  integrity: sha256            # Integrity algorithm    remote_subnet: 192.168.1.0/24
+```yaml✅ **Flexible Configuration**
 
-  dh_group: 14                 # Diffie-Hellman group    peer_ip: 203.0.113.10
+global:
 
-  auto_start: true             # Auto-start on boot
+  ike_version: ikev2           # IKE protocol version- IKEv1 and IKEv2 support- **controller/policy.yaml** - Unified policy definition
+
+  auth_method: psk             # Authentication method
+
+  psk: "shared_secret_key"     # Pre-shared key- Multiple encryption algorithms (AES-128, AES-192, AES-256, 3DES)- **controller/policy_engine.py** - Main orchestrator
+
+  encryption: aes256           # Encryption algorithm
+
+  integrity: sha256            # Integrity algorithm- Multiple integrity algorithms (SHA-1, SHA-256, SHA-384, SHA-512, MD5)- **controller/validator.py** - Configuration validation
+
+  dh_group: 14                 # Diffie-Hellman group
+
+  auto_start: true             # Auto-start on boot- PSK and certificate-based authentication (PSK fully implemented)- **adapters/** - OS-specific implementations
+
+
+
+tunnels:- Configurable DH groups- **installer/** - Deployment scripts
+
+  # Site-to-site tunnel (ESP Tunnel Mode)
+
+  - name: site_to_site- **services/unified-ipsec.service** - Linux auto-start
+
+    mode: tunnel
+
+    protocol: esp✅ **Automatic Operation**
+
+    local_subnet: 10.0.0.0/24
+
+    remote_subnet: 192.168.1.0/24- Auto-start on system boot## Installation
+
+    peer_ip: 203.0.113.10
+
+- Automatic tunnel initialization and recovery
 
   # Host-to-host (ESP Transport Mode)
 
-tunnels:  - name: host_to_host
+  - name: host_to_host- Comprehensive logging of tunnel status and events### Linux (Ubuntu/Debian/CentOS/RHEL)
 
-  # Site-to-site tunnel (ESP Tunnel Mode)    mode: transport
+    mode: transport
 
-  - name: site_to_site    protocol: esp
+    protocol: esp- Configuration validation before deployment```bash
 
-    mode: tunnel    peer_ip: 203.0.113.20
+    peer_ip: 203.0.113.20
 
-    protocol: esp
+cd unified-ipsec
 
-    local_subnet: 10.0.0.0/24  # AH Tunnel Mode (authentication-only)
+  # AH Tunnel Mode (authentication-only)
 
-    remote_subnet: 192.168.1.0/24  - name: auth_tunnel
+  - name: auth_tunnel✅ **Cross-Platform**sudo ./installer/install_linux.sh
 
-    peer_ip: 203.0.113.10    mode: tunnel
+    mode: tunnel
 
-    protocol: ah
+    protocol: ah- Single policy for all operating systems```
 
-  # Host-to-host (ESP Transport Mode)    local_subnet: 10.1.0.0/24
+    local_subnet: 10.1.0.0/24
 
-  - name: host_to_host    remote_subnet: 192.168.2.0/24
-
-    mode: transport    peer_ip: 203.0.113.30
-
-    protocol: esp
-
-    peer_ip: 203.0.113.20  # ESP + AH Combined (encryption + dual authentication)
-
-  - name: combined_tunnel
-
-  # AH Tunnel Mode (authentication-only)    mode: tunnel
-
-  - name: auth_tunnel    protocol: esp-ah
-
-    mode: tunnel    local_subnet: 10.2.0.0/24
-
-    protocol: ah    remote_subnet: 192.168.3.0/24
-
-    local_subnet: 10.1.0.0/24    peer_ip: 203.0.113.40
-
-    remote_subnet: 192.168.2.0/24```
+    remote_subnet: 192.168.2.0/24- Platform-specific adapters handle OS differences
 
     peer_ip: 203.0.113.30
 
-## Usage
+- Uniform security parameters across network### Windows (PowerShell as Administrator)
 
   # ESP + AH Combined
 
+  - name: combined_tunnel```powershell
+
+    mode: tunnel
+
+    protocol: esp-ah## Installationcd unified-ipsec
+
+    local_subnet: 10.2.0.0/24
+
+    remote_subnet: 192.168.3.0/24Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+
+    peer_ip: 203.0.113.40
+
+```### Linux (Ubuntu/Debian/CentOS/RHEL/BOSS).\installer\install_windows.ps1
+
+
+
+## Usage```bash```
+
+
+
+### Validate Configurationcd unified-ipsec
+
+```bash
+
+python3 controller/validator.pysudo ./installer/install_linux.sh### macOS
+
+```
+
+``````bash
+
+### Deploy Policy
+
+```bashcd unified-ipsec
+
+# Linux/macOS
+
+sudo python3 controller/policy_engine.py### Windows (PowerShell as Administrator)sudo ./installer/install_macos.sh
+
+
+
+# Windows```powershell```
+
+python "C:\Program Files\UnifiedIPsec\controller\policy_engine.py"
+
+```cd unified-ipsec
+
+
+
+### View Status and LogsSet-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process## Configuration
+
+```bash
+
+# Linux - Service status.\installer\install_windows.ps1
+
+sudo systemctl status unified-ipsec
+
+sudo journalctl -u unified-ipsec -f```Edit `controller/policy.yaml`:
+
+
+
+# Linux/macOS - Application logs
+
+tail -f logs/ipsec.log
+
+### macOS```yaml
+
+# Windows - Task status
+
+Get-ScheduledTask -TaskName UnifiedIPsec```bashglobal:
+
+
+
+# macOS - Daemon statuscd unified-ipsec  ike_version: ikev2
+
+sudo launchctl list | grep unifiedipsec
+
+```sudo ./installer/install_macos.sh  auth_method: psk
+
+
+
+## Testing```  psk: "shared_secret_key"
+
+
+
+### Demo (Non-Destructive)  encryption: aes256
+
+```bash
+
+./demo.sh## Configuration  integrity: sha256
+
+```
+
+  dh_group: 14
+
+### Test Encrypted Traffic (Linux)
+
+```bashEdit `controller/policy.yaml` to define your IPsec policies:  auto_start: true
+
+# Terminal 1: Monitor ESP packets
+
+sudo tcpdump -i any esp
+
+
+
+# Terminal 2: Configure and deploy```yamltunnels:
+
+sudo python3 controller/policy_engine.py
+
+global:  # Site-to-site tunnel (ESP Tunnel Mode)
+
+# Terminal 3: Generate traffic through tunnel
+
+ping <remote_subnet_ip>  ike_version: ikev2           # IKE protocol version  - name: site_to_site
+
+
+
+# Terminal 1 should show ESP packets indicating encryption  auth_method: psk             # Authentication method    mode: tunnel
+
+```
+
+  psk: "shared_secret_key"     # Pre-shared key    protocol: esp
+
+## Supported Configurations
+
+  encryption: aes256           # Encryption algorithm    local_subnet: 10.0.0.0/24
+
+| Category | Supported |
+
+|----------|-----------|  integrity: sha256            # Integrity algorithm    remote_subnet: 192.168.1.0/24
+
+| **IPsec Modes** | Tunnel, Transport |
+
+| **Protocols** | ESP, AH, ESP+AH |  dh_group: 14                 # Diffie-Hellman group    peer_ip: 203.0.113.10
+
+| **Encryption** | AES-128, AES-192, AES-256, 3DES |
+
+| **Integrity** | SHA-1, SHA-256, SHA-384, SHA-512, MD5 |  auto_start: true             # Auto-start on boot
+
+| **Key Exchange** | IKEv1, IKEv2 |
+
+| **DH Groups** | 2, 5, 14, 15, 16, 17, 18, 19, 20, 21 |  # Host-to-host (ESP Transport Mode)
+
+| **Authentication** | PSK (fully), Certificates (structure) |
+
+| **Platforms** | Linux, Windows, macOS, BOSS OS |tunnels:  - name: host_to_host
+
+
+
+## File Structure  # Site-to-site tunnel (ESP Tunnel Mode)    mode: transport
+
+
+
+```  - name: site_to_site    protocol: esp
+
+controller/
+
+├── policy.yaml              # Unified policy definition    mode: tunnel    peer_ip: 203.0.113.20
+
+├── policy_engine.py         # Main orchestrator
+
+└── validator.py             # Configuration validator    protocol: esp
+
+
+
+adapters/    local_subnet: 10.0.0.0/24  # AH Tunnel Mode (authentication-only)
+
+├── linux/strongswan_adapter.py
+
+├── windows/windows_ipsec.ps1    remote_subnet: 192.168.1.0/24  - name: auth_tunnel
+
+├── macos/macos_ipsec.sh
+
+└── boss_os/boss_adapter.py    peer_ip: 203.0.113.10    mode: tunnel
+
+
+
+installer/    protocol: ah
+
+├── install_linux.sh
+
+├── install_windows.ps1  # Host-to-host (ESP Transport Mode)    local_subnet: 10.1.0.0/24
+
+└── install_macos.sh
+
+  - name: host_to_host    remote_subnet: 192.168.2.0/24
+
+services/
+
+└── unified-ipsec.service    # systemd auto-start    mode: transport    peer_ip: 203.0.113.30
+
+
+
+demo.sh                       # Non-destructive demo    protocol: esp
+
+logs/                         # Runtime logs
+
+```    peer_ip: 203.0.113.20  # ESP + AH Combined (encryption + dual authentication)
+
+
+
+## License  - name: combined_tunnel
+
+
+
+MIT License - see LICENSE file for details  # AH Tunnel Mode (authentication-only)    mode: tunnel
+
+
+
+## Contributing  - name: auth_tunnel    protocol: esp-ah
+
+
+
+Contributions welcome! Focus areas:    mode: tunnel    local_subnet: 10.2.0.0/24
+
+- macOS adapter completion
+
+- Certificate-based authentication    protocol: ah    remote_subnet: 192.168.3.0/24
+
+- Windows advanced IPsec configurations
+
+- Performance optimization    local_subnet: 10.1.0.0/24    peer_ip: 203.0.113.40
+
+- Additional OS support
+
+    remote_subnet: 192.168.2.0/24```
+
+## Quick Start
+
+    peer_ip: 203.0.113.30
+
+1. **Install**: Run installer for your OS
+
+2. **Configure**: Edit `policy.yaml`## Usage
+
+3. **Validate**: Run `python3 controller/validator.py`
+
+4. **Deploy**: Run `python3 controller/policy_engine.py`  # ESP + AH Combined
+
+5. **Verify**: Check logs and tunnel status
+
   - name: combined_tunnel### Validate Configuration
+
+For detailed information, see QUICKSTART.md and TECHNICAL_DOCUMENTATION.md
 
     mode: tunnel```bash
 
