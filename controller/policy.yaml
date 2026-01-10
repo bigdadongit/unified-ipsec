@@ -1,0 +1,24 @@
+# Unified IPsec Policy Configuration
+# This policy is automatically translated to platform-specific configs
+
+global:
+  ike_version: ikev2
+  auth_method: psk
+  psk: "demo_shared_key"
+  encryption: aes256
+  integrity: sha256
+  dh_group: 14
+  auto_start: true
+
+tunnels:
+  - name: site_to_site
+    mode: tunnel
+    protocol: esp
+    local_subnet: 10.0.0.0/24
+    remote_subnet: 192.168.1.0/24
+    peer_ip: 203.0.113.10
+
+  - name: host_to_host
+    mode: transport
+    protocol: esp
+    peer_ip: 203.0.113.20

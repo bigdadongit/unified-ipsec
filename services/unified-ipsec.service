@@ -1,0 +1,27 @@
+[Unit]
+Description=Unified IPsec Policy Engine
+Documentation=https://github.com/yourusername/unified-ipsec
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/unified-ipsec/controller/policy_engine.py
+RemainAfterExit=yes
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=unified-ipsec
+
+# Restart configuration
+Restart=on-failure
+RestartSec=30s
+
+# Security settings
+NoNewPrivileges=false
+PrivateTmp=true
+
+# Working directory
+WorkingDirectory=/opt/unified-ipsec
+
+[Install]
+WantedBy=multi-user.target
