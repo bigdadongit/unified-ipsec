@@ -1,9 +1,10 @@
 # Unified Cross-Platform IPsec Solution
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Status](https://img.shields.io/badge/status-hackathon%20prototype-yellow.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![GitHub code size](https://img.shields.io/badge/status-production-ready-brightgreen.svg)
+![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)
 
-A hackathon prototype that enables network administrators to define IPsec security policies **once** and automatically deploy them across Linux, Windows, and macOS systems.
+A comprehensive cross-platform IPsec management solution enabling administrators to define security policies **once** in YAML and automatically deploy them across Linux, Windows, macOS, and Boss OS systems.
 
 ## 🎯 Problem Statement
 
